@@ -1,0 +1,1406 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ChatApp{% endblock %}
+
+{% block extra_css %}
+    <style>
+    .chat-container {
+        height: calc(110vh - 180px);
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    body.dark-mode .chat-container {
+        background: rgba(33, 37, 41, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .users-list {
+        height: 100%;
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .search-box {
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        border-radius: 10px 10px 0 0;
+        flex-shrink: 0;
+    }
+
+    #chatsList {
+        flex-grow: 1;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 0 0 10px 10px;
+    }
+
+    .user-item {
+        padding: 40px 20px;
+        margin: 2px 0;
+        border-bottom: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        height: 45px;
+    }
+
+    .user-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+    }
+
+    .user-item.active {
+        background: rgba(var(--primary-color-rgb), 0.2);
+        color: var(--primary-color);
+        border-left: 3px solid var(--primary-color);
+    }
+
+    .chat-area {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .chat-header {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .chat-messages {
+        flex-grow: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .message {
+        margin-bottom: 15px;
+        max-width: 70%;
+    }
+
+    .message.sent {
+        margin-left: auto;
+    }
+
+    .message-content {
+        padding: 10px 15px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .message.sent .message-content {
+        background: rgba(var(--primary-color-rgb), 0.2);
+        color: var(--primary-color);
+        border-color: rgba(var(--primary-color-rgb), 0.3);
+    }
+
+    .chat-input {
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 12px 40px 12px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+
+    .search-box input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .search-box .search-icon {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-color);
+        opacity: 0.7;
+    }
+
+    .search-input-container {
+        position: relative;
+        flex-grow: 1;
+    }
+
+    body.dark-mode .search-box {
+        background: rgba(33, 37, 41, 0.1);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .search-box input {
+        background: rgba(33, 37, 41, 0.2);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+
+    body.dark-mode .search-box input:focus {
+        background: rgba(33, 37, 41, 0.3);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .users-list {
+            border-radius: 8px;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .user-item {
+            padding: 10px 15px;
+            height: 80px;
+        }
+
+        /* .user-avatar {
+            width: 40px;
+            height: 40px;
+        } */
+
+        .user-info h6 {
+            font-size: 0.8rem;
+        }
+
+        .user-info p {
+            font-size: 0.7rem;
+        }
+
+        .last-message-time {
+            font-size: 0.65rem;
+        }
+    }
+
+    .unread-badge {
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        margin-left: 5px;
+        min-width: 16px;
+        text-align: center;
+        display: inline-block;
+    }
+
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .user-avatar i {
+        font-size: 1.6rem;
+    }
+
+    .user-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-avatar i.fa-mars {
+        color: #007bff;
+    }
+
+    .user-avatar i.fa-venus {
+        color: #e83e8c;
+    }
+
+    .user-avatar i.fa-user-circle {
+        color: #6c757d;
+    }
+
+    .user-info {
+        flex-grow: 1;
+        min-width: 0;
+        overflow: hidden;
+        padding-left: 15px;
+    }
+
+    .user-info h6 {
+        margin: 0;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        line-height: 1.2;
+        margin-bottom: 4px;
+        color: #000000;
+        font-weight: 600;
+    }
+
+    body.dark-mode .user-info h6 {
+        color: #ffffff;
+    }
+
+    .user-info p {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #666;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1;
+    }
+
+    .last-message {
+        font-size: 0.75rem;
+        color: var(--text-color);
+        opacity: 0.8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .last-message-time {
+        font-size: 0.7rem;
+        color: var(--text-color);
+        opacity: 0.6;
+        margin-left: 8px;
+        white-space: nowrap;
+    }
+
+    .unread-badge.hidden {
+        display: none;
+    }
+
+    .no-chats {
+        text-align: center;
+        padding: 30px 15px;
+        color: var(--text-color);
+        opacity: 0.7;
+    }
+
+    .no-chats p {
+        margin-bottom: 15px;
+    }
+
+    .no-chats .btn-primary {
+        background: rgba(var(--primary-color-rgb), 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--primary-color);
+        backdrop-filter: blur(5px);
+    }
+
+    .no-chats .btn-primary:hover {
+        background: rgba(var(--primary-color-rgb), 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .user-item.active .last-message-time {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* User Profile Styles */
+    .user-profile {
+        position: fixed;
+        top: 10px;
+        right: 30px;
+        z-index: 1000;
+    }
+
+    .profile-icon {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 18px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        background: rgba(var(--primary-color-rgb), 0.8);
+    }
+
+    .profile-icon:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.4);
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(var(--primary-color-rgb), 0.9);
+    }
+
+    .profile-icon:active {
+        transform: scale(0.95);
+    }
+
+    .profile-icon-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-icon i {
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .profile-icon:hover i {
+        transform: scale(1.1);
+    }
+
+    .profile-dropdown {
+        position: absolute;
+        top: 50px;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        padding: 15px;
+        min-width: 200px;
+        display: none;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transform: translateY(-10px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .profile-dropdown.show {
+        display: block;
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .profile-dropdown .user-info {
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 10px;
+    }
+
+    .profile-dropdown .user-info p:first-child {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .profile-dropdown .user-info .username {
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    .profile-dropdown .user-info p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .profile-dropdown .menu-item {
+        display: block;
+        padding: 8px;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        transition: background-color 0.2s;
+    }
+
+    .profile-dropdown .menu-item:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .profile-dropdown .logout-btn {
+        width: 100%;
+        padding: 8px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+    }
+
+    .profile-dropdown .logout-btn:hover {
+        background-color: #c82333;
+    }
+
+    /* All Users Modal Styles */
+    .all-users-section {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: transparent;
+        z-index: 1000;
+        padding: 0;
+        overflow-y: auto;
+    }
+
+    .all-users-section.show {
+        display: block;
+    }
+
+    .all-users-container {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        height: 100%;
+        margin: 0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .all-users-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 10px 10px 0 0;
+        flex-shrink: 0;
+    }
+
+    .all-users-header h5 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--text-color);
+    }
+
+    .close-all-users {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        font-size: 1.2rem;
+        padding: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .close-all-users:hover {
+        transform: rotate(90deg);
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary-color);
+    }
+
+    .close-all-users:active {
+        transform: rotate(180deg) scale(0.9);
+    }
+
+    .close-all-users i {
+        transition: all 0.3s ease;
+    }
+
+    .close-all-users:hover i {
+        transform: scale(1.2);
+    }
+
+    .user-search {
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .user-search input {
+        width: 100%;
+        padding: 12px 40px 12px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+
+    .user-search input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .user-search i {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-color);
+        opacity: 0.7;
+    }
+
+    .all-users-content {
+        flex-grow: 1;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 0 0 10px 10px;
+    }
+
+    .all-users-item {
+        padding: 40px 20px;
+        margin: 2px 0;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        height: 45px;
+    }
+
+    .all-users-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+    }
+
+    .all-users-item:active {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .all-users-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .user-details {
+        flex-grow: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .user-details h6 {
+        margin: 0;
+        color: var(--text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+        line-height: 1;
+    }
+
+    .user-details small {
+        color: var(--text-color);
+        opacity: 0.7;
+        display: block;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.85rem;
+        line-height: 1;
+    }
+
+    @media (max-width: 768px) {
+        .user-avatar {
+            width: 60px !important;
+            height: 60px !important;
+            min-width: 60px !important;
+            min-height: 60px !important;
+        }
+
+        .user-avatar i {
+            font-size: 1.6rem !important;
+    }
+
+    .user-item {
+            padding: 10px 15px !important;
+            height: 80px !important;
+            min-height: 80px !important;
+    }
+
+        .all-users-item {
+            padding: 10px 15px !important;
+            height: 80px !important;
+            min-height: 80px !important;
+    }
+
+        .user-info {
+            padding-left: 15px !important;
+        }
+
+        .user-info h6 {
+        font-size: 0.9rem;
+            margin-bottom: 3px;
+            color: #000000;
+        }
+
+        body.dark-mode .user-info h6 {
+            color: #ffffff;
+        }
+
+        .user-info p {
+            font-size: 0.9rem !important;
+    }
+
+    .last-message {
+        font-size: 0.8rem;
+            font-weight: 600;
+        }
+    }
+
+    /* Small Mobile Devices */
+    @media (max-width: 480px) {
+        .user-avatar {
+            width: 60px !important;
+            height: 60px !important;
+            min-width: 60px !important;
+            min-height: 60px !important;
+    }
+
+        .user-item {
+            padding: 10px 15px !important;
+            height: 80px !important;
+            min-height: 80px !important;
+    }
+
+        .all-users-item {
+            padding: 10px 15px !important;
+            height: 80px !important;
+            min-height: 80px !important;
+        }
+    }
+
+    /* Fix for iOS Safari 100vh issue */
+    @supports (-webkit-touch-callout: none) {
+        .chat-container {
+            height: -webkit-fill-available;
+    }
+    }
+
+    /* Welcome Message Styles */
+    #welcomeMessage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 20px;
+    }
+
+    #welcomeMessage i {
+        font-size: 4rem;
+        color: var(--text-color);
+        opacity: 0.7;
+        margin-bottom: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    #welcomeMessage h4 {
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    #welcomeMessage p {
+        color: var(--text-color);
+        opacity: 0.7;
+    }
+
+    @media (max-width: 768px) {
+        #welcomeMessage {
+            padding: 10px;
+        }
+
+        #welcomeMessage i {
+            font-size: 3rem;
+            padding: 15px;
+            margin-bottom: 0;
+        }
+
+        #welcomeMessage h4,
+        #welcomeMessage p {
+            display: none;
+        }
+    }
+
+    body.dark-mode #welcomeMessage i {
+        background: rgba(33, 37, 41, 0.1);
+        border-color: rgba(255, 255, 255, 0.1);
+        }
+
+    /* Hide Scrollbars */
+    .users-list,
+    .chat-messages,
+    .all-users-content,
+    .all-users-section,
+    .chat-container,
+    .profile-dropdown,
+    .search-box,
+    .user-search,
+    .chat-area,
+    #chatsList,
+    .all-users-container {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+        }
+
+    .users-list::-webkit-scrollbar,
+    .chat-messages::-webkit-scrollbar,
+    .all-users-content::-webkit-scrollbar,
+    .all-users-section::-webkit-scrollbar,
+    .chat-container::-webkit-scrollbar,
+    .profile-dropdown::-webkit-scrollbar,
+    .search-box::-webkit-scrollbar,
+    .user-search::-webkit-scrollbar,
+    .chat-area::-webkit-scrollbar,
+    #chatsList::-webkit-scrollbar,
+    .all-users-container::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+
+    /* Ensure smooth scrolling */
+    .users-list,
+    .chat-messages,
+    .all-users-content,
+    .all-users-section,
+    .chat-container,
+    .profile-dropdown,
+    .search-box,
+    .user-search,
+    .chat-area,
+    #chatsList,
+    .all-users-container {
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        scroll-behavior: smooth;
+        }
+
+    /* Maintain scroll functionality */
+    .users-list,
+    .chat-messages,
+    .all-users-content,
+    .all-users-section,
+    .chat-container,
+    .profile-dropdown,
+    .search-box,
+    .user-search,
+    .chat-area,
+    #chatsList,
+    .all-users-container {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    #allUsersBtn {
+        width: 45px !important;
+        height: 45px !important;
+        border-radius: 50% !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 2px solid var(--primary-color) !important;
+        color: var(--primary-color) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1) !important;
+    }
+
+    #allUsersBtn:hover {
+        transform: translateY(-2px) scale(1.05) !important;
+        background: rgba(var(--primary-color-rgb), 0.1) !important;
+        box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.2) !important;
+        border-color: var(--primary-color) !important;
+    }
+
+    #allUsersBtn:active {
+        transform: translateY(1px) scale(0.95) !important;
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1) !important;
+    }
+
+    #allUsersBtn i {
+        font-size: 1.2rem !important;
+        transition: all 0.3s ease !important;
+        color: var(--primary-color) !important;
+    }
+
+    #allUsersBtn:hover i {
+        transform: rotate(15deg) scale(1.1) !important;
+    }
+
+    body.dark-mode #allUsersBtn {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2) !important;
+    }
+
+    body.dark-mode #allUsersBtn:hover {
+        background: rgba(var(--primary-color-rgb), 0.15) !important;
+        box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.3) !important;
+    }
+
+    @media (max-width: 768px) {
+        #allUsersBtn {
+            width: 40px !important;
+            height: 40px !important;
+            border-width: 2px !important;
+        }
+
+        #allUsersBtn i {
+            font-size: 1.1rem !important;
+        }
+    }
+
+    body.dark-mode .last-message {
+        color: #ffffff;
+        opacity: 0.9;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="chat-container">
+        <div class="row h-100">
+            <!-- Users List -->
+            <div class="col-md-4 users-list">
+                <div class="search-box">
+                    <div class="d-flex align-items-center">
+                        <div class="search-input-container">
+                            <input type="text" class="form-control" id="chatSearchInput" placeholder="Search chats...">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <button class="btn btn-circle ms-2" id="allUsersBtn" title="All Users" style="min-width: 44px; min-height: 44px;">
+                            <i class="fas fa-users"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="chatsList">
+                    {% if chatted_users %}
+                        {% for user in chatted_users %}
+                            <a href="{{ url_for('chat', userid=user.userid) }}" class="text-decoration-none">
+                                <div class="user-item" data-userid="{{ user.userid }}">
+                                    <div class="user-avatar clickable-photo" onclick="event.preventDefault(); event.stopPropagation(); showProfilePhotoModal('{{ url_for('uploaded_file', filename=user.profile_photo) if user.profile_photo else '' }}');">
+                                        {% if user.profile_photo %}
+                                            <img src="{{ url_for('uploaded_file', filename=user.profile_photo) }}" alt="{{ user.userid }}" class="user-avatar-img">
+                                        {% else %}
+                                            {% if user.gender == 'male' %}
+                                                <i class="fas fa-mars"></i>
+                                            {% elif user.gender == 'female' %}
+                                                <i class="fas fa-venus"></i>
+                                            {% else %}
+                                                <i class="fas fa-user"></i>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-info">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                            <h6>{{ user.userid }}</h6>
+                                                {% if user.unread_count > 0 %}
+                                                    <span class="unread-badge" id="unread-{{ user.userid }}">{{ user.unread_count }}</span>
+                                                {% else %}
+                                                    <span class="unread-badge hidden" id="unread-{{ user.userid }}">0</span>
+                                                {% endif %}
+                                            </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <p class="last-message">{{ user.last_message or 'No messages yet' }}</p>
+                                            <span class="last-message-time">
+                                                {% if user.last_message_time %}
+                                                    {{ user.last_message_time.split()[1][:5] }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-chats">
+                            <p>No chats yet</p>
+                            <button class="btn btn-primary btn-sm" onclick="toggleAllUsers()">
+                                Start a new chat
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="col-md-8 chat-area">
+                <!-- Welcome Message -->
+                <div class="text-center p-5" id="welcomeMessage">
+                    <i class="fas fa-comments"></i>
+                    <h4>Welcome to ChatApp</h4>
+                    <p class="text-muted">Select a user to start chatting</p>
+                </div>
+
+                <!-- All Users Section -->
+                <div class="all-users-section" id="allUsersSection">
+                    <div class="all-users-container">
+                    <div class="all-users-header">
+                            <h5>All Users</h5>
+                            <button class="close-all-users" onclick="toggleAllUsers()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="user-search">
+                        <input type="text" class="form-control" id="userSearchInput" placeholder="Search users...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="all-users-content" id="allUsersList">
+                        {% for user in all_users %}
+                                <div class="all-users-item" data-userid="{{ user.userid }}" onclick="window.location.href='{{ url_for('chat', userid=user.userid) }}'">
+                                <div class="user-avatar clickable-photo" onclick="event.stopPropagation(); showProfilePhotoModal('{{ url_for('uploaded_file', filename=user.profile_photo) if user.profile_photo else '' }}');">
+                                    {% if user.profile_photo %}
+                                        <img src="{{ url_for('uploaded_file', filename=user.profile_photo) }}" alt="{{ user.userid }}" class="user-avatar-img">
+                                    {% else %}
+                                        {% if user.gender == 'male' %}
+                                            <i class="fas fa-mars"></i>
+                                        {% elif user.gender == 'female' %}
+                                            <i class="fas fa-venus"></i>
+                                        {% else %}
+                                            <i class="fas fa-user"></i>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="user-details">
+                                    <h6>{{ user.userid }}</h6>
+                                    <small>{{ user.email }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize notifications
+    function initializeNotifications() {
+        checkNotifications();
+        setInterval(checkNotifications, 5000);
+    }
+
+    // Check for unread messages
+    function checkNotifications() {
+        fetch('/check_notifications')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(notification => {
+                    const badge = document.getElementById(`unread-${notification.userid}`);
+                    if (badge) {
+                        badge.style.display = 'inline-block';
+                        badge.textContent = notification.unread_count;
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error checking notifications:', error);
+            });
+    }
+
+    // Remove chat function
+    function removeChat(userid) {
+        if (confirm('Are you sure you want to remove this chat?')) {
+            fetch(`/remove_chat/${userid}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    const userItem = document.querySelector(`.user-item[data-userid="${userid}"]`);
+                    if (userItem) {
+                        userItem.remove();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to remove chat');
+            });
+        }
+    }
+
+    // Handle user item clicks
+    document.addEventListener('click', function(event) {
+        const userItem = event.target.closest('.user-item');
+        if (userItem) {
+            const userId = userItem.dataset.userid;
+            window.location.href = `/chat/${userId}`;
+        }
+    });
+
+    // Initialize everything when the page loads
+    document.addEventListener('DOMContentLoaded', initializeNotifications);
+
+    // Toggle All Users Section
+    function toggleAllUsers() {
+        const allUsersSection = document.getElementById('allUsersSection');
+        const usersList = document.querySelector('.users-list');
+        const body = document.body;
+        
+        if (allUsersSection) {
+            if (allUsersSection.style.display === 'none' || !allUsersSection.style.display) {
+                // Show modal
+                allUsersSection.style.display = 'block';
+                if (window.innerWidth <= 768) {
+                    usersList.style.display = 'none';
+                }
+                body.style.overflow = 'hidden'; // Prevent background scrolling
+                
+                // Focus search input
+                const searchInput = document.getElementById('userSearchInput');
+                if (searchInput) {
+                    setTimeout(() => searchInput.focus(), 100);
+                }
+
+                // Ensure all profile photos are visible
+                const allUsersItems = document.querySelectorAll('.all-users-item');
+                allUsersItems.forEach(item => {
+                    item.style.display = 'flex';
+                });
+
+                // Remove any existing no results message
+                const noResults = document.querySelector('.no-results');
+                if (noResults) {
+                    noResults.remove();
+                }
+        } else {
+                // Hide modal
+                allUsersSection.style.display = 'none';
+                if (window.innerWidth <= 768) {
+                    usersList.style.display = 'block';
+                }
+                body.style.overflow = ''; // Restore scrolling
+                
+                // Clear search and reset visibility
+                const searchInput = document.getElementById('userSearchInput');
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                
+                // Show all items
+                const allUsersItems = document.querySelectorAll('.all-users-item');
+                allUsersItems.forEach(item => {
+                    item.style.display = 'flex';
+                });
+
+                // Remove any existing no results message
+                const noResults = document.querySelector('.no-results');
+                if (noResults) {
+                    noResults.remove();
+                }
+            }
+        }
+    }
+
+    // Add proper event listeners for mobile support
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize notifications
+        initializeNotifications();
+
+        // Add touch and click event listeners for All Users button
+        const allUsersBtn = document.getElementById('allUsersBtn');
+        if (allUsersBtn) {
+            allUsersBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleAllUsers();
+            });
+        }
+
+        // Close modal when clicking outside
+        const allUsersSection = document.getElementById('allUsersSection');
+        if (allUsersSection) {
+            allUsersSection.addEventListener('click', function(e) {
+                if (e.target === allUsersSection) {
+                    toggleAllUsers();
+                }
+            });
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const allUsersSection = document.getElementById('allUsersSection');
+            const usersList = document.querySelector('.users-list');
+            if (window.innerWidth > 768) {
+                usersList.style.display = 'block';
+            } else if (allUsersSection.style.display === 'block') {
+                usersList.style.display = 'none';
+            }
+        });
+
+        // Handle user item clicks
+        const allUsersItems = document.querySelectorAll('.all-users-item');
+        allUsersItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const userId = this.getAttribute('data-userid');
+                if (userId) {
+                    window.location.href = `/chat/${userId}`;
+                }
+            });
+        });
+    });
+
+    // Modified real-time user search
+    const userSearchInput = document.getElementById('userSearchInput');
+    let searchTimeout;
+
+    userSearchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const searchQuery = this.value.trim().toLowerCase();
+            const allUsersItems = document.querySelectorAll('.all-users-item');
+            const noResults = document.querySelector('.no-results');
+            
+            // Remove existing no results message if any
+            if (noResults) {
+                noResults.remove();
+            }
+            
+            let hasVisibleItems = false;
+            
+            allUsersItems.forEach(item => {
+                const userId = item.querySelector('h6').textContent.toLowerCase();
+                const userEmail = item.querySelector('small').textContent.toLowerCase();
+                
+                if (userId.includes(searchQuery) || userEmail.includes(searchQuery)) {
+                    item.style.display = 'flex';
+                    hasVisibleItems = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Only show no results message if there's a search query and no matches
+            if (searchQuery && !hasVisibleItems) {
+                const noResultsDiv = document.createElement('div');
+                noResultsDiv.className = 'no-results';
+                noResultsDiv.textContent = 'No users found';
+                document.getElementById('allUsersList').appendChild(noResultsDiv);
+            }
+        }, 300);
+    });
+
+    // Update users list helper function
+    function updateUsersList(users) {
+        const usersList = document.getElementById('allUsersList');
+        const noResults = document.querySelector('.no-results');
+        
+        // Remove existing no results message if any
+        if (noResults) {
+            noResults.remove();
+        }
+
+        if (users.length === 0) {
+            const noResultsDiv = document.createElement('div');
+            noResultsDiv.className = 'no-results';
+            noResultsDiv.textContent = 'No users found';
+            usersList.appendChild(noResultsDiv);
+            return;
+        }
+
+        usersList.innerHTML = users.map(user => `
+            <div class="all-users-item" data-userid="${user.userid}" onclick="window.location.href='/chat/${user.userid}'">
+                <div class="user-avatar clickable-photo" onclick="event.stopPropagation(); showProfilePhotoModal('${user.profile_photo ? `/uploads/${user.profile_photo}` : ''}');">
+                    ${user.profile_photo 
+                        ? `<img src="/uploads/${user.profile_photo}" alt="${user.userid}" class="user-avatar-img">`
+                        : `<i class="fas ${user.gender === 'male' ? 'fa-mars' : user.gender === 'female' ? 'fa-venus' : 'fa-user'}"></i>`
+                    }
+                </div>
+                <div class="user-details">
+                    <h6>${user.userid}</h6>
+                    <small>${user.email}</small>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Chat search functionality
+    document.getElementById('chatSearchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const chatItems = document.querySelectorAll('.user-item');
+        
+        chatItems.forEach(item => {
+            const userId = item.querySelector('.user-name').textContent.toLowerCase();
+            
+            if (userId.includes(searchTerm)) {
+                item.parentElement.style.display = '';
+            } else {
+                item.parentElement.style.display = 'none';
+            }
+        });
+    });
+
+    // Check for refresh flag when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('refresh_dashboard') === 'true') {
+            // Clear the flag
+            localStorage.removeItem('refresh_dashboard');
+            // Reload the page
+            window.location.reload();
+        }
+    });
+
+    // Check for refresh flag when page becomes visible
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && localStorage.getItem('refresh_dashboard') === 'true') {
+            // Clear the flag
+            localStorage.removeItem('refresh_dashboard');
+            // Reload the page
+            window.location.reload();
+        }
+    });
+
+    // Initialize socket.io connection
+    const socket = io();
+
+    // Handle chat list updates
+    socket.on('update_chat_list', function(data) {
+        const chatsList = document.getElementById('chatsList');
+        if (!chatsList) return;
+
+        // Clear existing chat list
+        chatsList.innerHTML = '';
+
+        if (data.chat_list.length === 0) {
+            // Show no chats message if list is empty
+            chatsList.innerHTML = `
+                <div class="no-chats">
+                    <p>No chats yet</p>
+                    <button class="btn btn-primary btn-sm" onclick="toggleAllUsers()">
+                        Start a new chat
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        // Add each chat to the list
+        data.chat_list.forEach(chat => {
+            const chatItem = document.createElement('a');
+            chatItem.className = 'text-decoration-none';
+            chatItem.href = `/chat/${chat.userid}`;
+            
+            chatItem.innerHTML = `
+                <div class="user-item" data-userid="${chat.userid}">
+                    <div class="user-avatar clickable-photo" onclick="event.preventDefault(); event.stopPropagation(); showProfilePhotoModal('${chat.profile_photo ? `/uploads/${chat.profile_photo}` : ''}');">
+                        ${chat.profile_photo 
+                            ? `<img src="/uploads/${chat.profile_photo}" alt="${chat.userid}" class="user-avatar-img">`
+                            : `<i class="fas ${chat.gender === 'male' ? 'fa-mars' : chat.gender === 'female' ? 'fa-venus' : 'fa-user'}"></i>`
+                        }
+                    </div>
+                    <div class="user-info">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6>${chat.userid}</h6>
+                            ${chat.unread_count > 0 
+                                ? `<span class="unread-badge" id="unread-${chat.userid}">${chat.unread_count}</span>`
+                                : `<span class="unread-badge hidden" id="unread-${chat.userid}">0</span>`
+                            }
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="last-message">${chat.last_message || 'No messages yet'}</p>
+                            <span class="last-message-time">
+                                ${chat.last_message_time ? chat.last_message_time.split(' ')[1].substring(0, 5) : ''}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            chatsList.appendChild(chatItem);
+        });
+    });
+
+    // Handle unread count updates
+    socket.on('unread_count', function(data) {
+        const badge = document.getElementById(`unread-${data.sender}`);
+        if (badge) {
+            if (data.count > 0) {
+                badge.style.display = 'inline-block';
+                badge.textContent = data.count;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,729 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - ChatApp{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Create Account</h2>
+                <p class="text-muted">Join our chat community</p>
+            </div>
+            <form id="signupForm" action="{{ url_for('signup') }}" method="POST">
+                <div class="mb-3">
+                    <label for="userid" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" id="userid" name="userid" required>
+                        <span class="input-group-text verification-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                    </div>
+                    <div class="verification-message"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <span class="input-group-text verification-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                    </div>
+                    <div class="verification-message"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="contact" class="form-label">Contact</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="text" class="form-control" id="contact" name="contact">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Gender</label>
+                    <div class="gender-options">
+                        <div class="gender-option">
+                            <input type="radio" name="gender" id="male" value="male" required>
+                            <label for="male">
+                                <i class="fas fa-mars"></i> Male
+                            </label>
+                        </div>
+                        <div class="gender-option">
+                            <input type="radio" name="gender" id="female" value="female" required>
+                            <label for="female">
+                                <i class="fas fa-venus"></i> Female
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4 text-center">
+                    <div class="profile-preview">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <p class="text-muted mt-2">Profile Preview</p>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">Sign Up</button>
+                <div class="text-center">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none">Login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.gender-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.gender-option {
+    position: relative;
+    padding: 10px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.gender-option i {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.gender-option:hover {
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-color-rgb), 0.05);
+}
+
+.gender-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.gender-option input[type="radio"]:checked + label {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.gender-option input[type="radio"]:checked + label i {
+    color: var(--primary-color);
+}
+
+.gender-option input[type="radio"]:checked + label::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.profile-preview {
+    margin-top: 20px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--primary-color);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.profile-avatar i {
+    font-size: 3rem;
+    transition: all 0.3s ease;
+}
+
+.profile-avatar i.fa-mars {
+    color: #007bff;
+}
+
+.profile-avatar i.fa-venus {
+    color: #e83e8c;
+}
+
+.profile-avatar i.fa-user-circle {
+    color: #6c757d;
+}
+
+@media (max-width: 576px) {
+    .gender-options {
+        gap: 10px;
+    }
+
+    .gender-option {
+        padding: 8px 15px;
+        min-width: 100px;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+
+    .profile-avatar i {
+        font-size: 2.5rem;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .input-group-text {
+        padding: 8px;
+    }
+
+    .btn {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .gender-option {
+        padding: 6px 12px;
+        min-width: 90px;
+    }
+
+    .profile-avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+
+    .profile-avatar i {
+        font-size: 2rem;
+    }
+}
+
+.error-message {
+    background: rgba(220, 53, 69, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verification-icon {
+    background: transparent;
+    border-left: none;
+    padding-right: 12px;
+}
+
+.verification-icon i {
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.verification-icon i.available {
+    color: #28a745;
+}
+
+.verification-icon i.taken {
+    color: #dc3545;
+}
+
+.verification-message {
+    font-size: 0.85rem;
+    margin-top: 5px;
+    padding-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.verification-message.available {
+    color: #28a745;
+}
+
+.verification-message.taken {
+    color: #dc3545;
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+.input-group-text {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+}
+
+.input-group .form-control:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .form-control:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .input-group-text:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .input-group-text:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .form-control:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.input-group .input-group-text:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-control:focus::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .form-control {
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .form-control:focus {
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .input-group-text {
+        background: rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .input-group-text {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Login link styling */
+.text-decoration-none {
+    color: var(--primary-color);
+    position: relative;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.text-decoration-none::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.text-decoration-none:hover {
+    color: var(--primary-color);
+    text-shadow: 0 0 8px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.text-decoration-none:hover::after {
+    width: 100%;
+}
+
+/* Button styling */
+.btn-primary {
+    background: rgba(var(--primary-color-rgb), 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: all 0.6s ease;
+    z-index: -1;
+}
+
+.btn-primary:hover {
+    background: rgba(var(--primary-color-rgb), 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.btn-primary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+/* Button loading animation */
+.btn-primary.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-primary.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: button-loading 0.8s infinite linear;
+}
+
+@keyframes button-loading {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .btn-primary {
+        background: rgba(var(--primary-color-rgb), 0.7);
+    }
+    
+    .btn-primary:hover {
+        background: rgba(var(--primary-color-rgb), 0.8);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .btn-primary {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const genderInputs = document.querySelectorAll('input[name="gender"]');
+    const profileAvatar = document.querySelector('.profile-avatar i');
+
+    genderInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value === 'male') {
+                profileAvatar.className = 'fas fa-mars';
+                profileAvatar.style.color = '#007bff';
+            } else if (this.value === 'female') {
+                profileAvatar.className = 'fas fa-venus';
+                profileAvatar.style.color = '#e83e8c';
+            }
+        });
+    });
+});
+
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+    const userid = document.getElementById('userid').value.trim();
+    const password = document.getElementById('password').value;
+    
+    if (userid.length < 5) {
+        e.preventDefault();
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = 'Username must be at least 5 characters';
+        this.appendChild(errorDiv);
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    
+    if (password.length < 4) {
+        e.preventDefault();
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = 'Password must be at least 4 characters';
+        this.appendChild(errorDiv);
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    
+    const submitButton = this.querySelector('button[type="submit"]');
+    submitButton.classList.add('loading');
+    
+    const formData = new FormData(this);
+    
+    fetch('/signup', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitButton.classList.remove('loading');
+        
+        if (data.error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = data.message;
+            
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            this.appendChild(errorDiv);
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            window.location.href = '/login';
+        }
+    })
+    .catch(error => {
+        submitButton.classList.remove('loading');
+        console.error('Error:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = 'An error occurred. Please try again.';
+        this.appendChild(errorDiv);
+    });
+});
+
+// Add user ID verification
+const useridInput = document.getElementById('userid');
+const useridVerificationIcon = document.querySelector('#userid + .verification-icon i');
+const useridVerificationMessage = document.querySelector('#userid').parentElement.nextElementSibling;
+let useridVerificationTimeout;
+
+useridInput.addEventListener('input', function() {
+    const userid = this.value.trim();
+    
+    // Clear previous timeout
+    if (useridVerificationTimeout) {
+        clearTimeout(useridVerificationTimeout);
+    }
+    
+    // Reset verification state
+    useridVerificationIcon.className = 'fas fa-check-circle';
+    useridVerificationIcon.style.color = '';
+    useridVerificationMessage.textContent = '';
+    useridVerificationMessage.className = 'verification-message';
+    
+    if (userid.length < 5) {
+        useridVerificationIcon.className = 'fas fa-exclamation-circle';
+        useridVerificationIcon.style.color = '#ffc107';
+        useridVerificationMessage.textContent = 'Username must be at least 5 characters';
+        useridVerificationMessage.className = 'verification-message taken';
+        return;
+    }
+    
+    // Add loading state
+    useridVerificationIcon.className = 'fas fa-spinner fa-spin';
+    
+    // Set timeout to prevent too many requests
+    useridVerificationTimeout = setTimeout(() => {
+        fetch('/check_userid', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userid: userid })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                useridVerificationIcon.className = 'fas fa-exclamation-circle';
+                useridVerificationIcon.style.color = '#ffc107';
+                useridVerificationMessage.textContent = data.error;
+                useridVerificationMessage.className = 'verification-message taken';
+            } else if (data.exists) {
+                useridVerificationIcon.className = 'fas fa-times-circle';
+                useridVerificationIcon.style.color = '#dc3545';
+                useridVerificationMessage.textContent = data.message;
+                useridVerificationMessage.className = 'verification-message taken';
+            } else {
+                useridVerificationIcon.className = 'fas fa-check-circle';
+                useridVerificationIcon.style.color = '#28a745';
+                useridVerificationMessage.textContent = data.message;
+                useridVerificationMessage.className = 'verification-message available';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            useridVerificationIcon.className = 'fas fa-exclamation-circle';
+            useridVerificationIcon.style.color = '#ffc107';
+            useridVerificationMessage.textContent = 'Error checking username availability';
+            useridVerificationMessage.className = 'verification-message taken';
+        });
+    }, 500); // Wait for 500ms after user stops typing
+});
+
+// Add email verification
+const emailInput = document.getElementById('email');
+const emailVerificationIcon = document.querySelector('#email + .verification-icon i');
+const emailVerificationMessage = document.querySelector('#email').parentElement.nextElementSibling;
+let emailVerificationTimeout;
+
+emailInput.addEventListener('input', function() {
+    const email = this.value.trim();
+    
+    // Clear previous timeout
+    if (emailVerificationTimeout) {
+        clearTimeout(emailVerificationTimeout);
+    }
+    
+    // Reset verification state
+    emailVerificationIcon.className = 'fas fa-check-circle';
+    emailVerificationIcon.style.color = '';
+    emailVerificationMessage.textContent = '';
+    emailVerificationMessage.className = 'verification-message';
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        emailVerificationIcon.className = 'fas fa-exclamation-circle';
+        emailVerificationIcon.style.color = '#ffc107';
+        emailVerificationMessage.textContent = 'Please enter a valid email address';
+        emailVerificationMessage.className = 'verification-message taken';
+        return;
+    }
+    
+    // Add loading state
+    emailVerificationIcon.className = 'fas fa-spinner fa-spin';
+    
+    // Set timeout to prevent too many requests
+    emailVerificationTimeout = setTimeout(() => {
+        fetch('/check_email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                emailVerificationIcon.className = 'fas fa-times-circle taken';
+                emailVerificationMessage.textContent = data.message;
+                emailVerificationMessage.className = 'verification-message taken';
+            } else {
+                emailVerificationIcon.className = 'fas fa-check-circle available';
+                emailVerificationMessage.textContent = data.message;
+                emailVerificationMessage.className = 'verification-message available';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            emailVerificationIcon.className = 'fas fa-exclamation-circle';
+            emailVerificationIcon.style.color = '#ffc107';
+        });
+    }, 500); // Wait for 500ms after user stops typing
+});
+
+// Add password validation
+const passwordInput = document.getElementById('password');
+
+passwordInput.addEventListener('input', function() {
+    const password = this.value;
+    
+    // Remove any existing error messages
+    const existingError = document.querySelector('.error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+});
+</script>
+{% endblock %}

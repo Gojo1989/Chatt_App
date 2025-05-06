@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Login - ChatApp{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Welcome Back</h2>
+                <p class="text-muted">Sign in to continue</p>
+            </div>
+            <form action="{{ url_for('login') }}" method="POST">
+                <div class="mb-3">
+                    <label for="userid" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" id="userid" name="userid" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                <div class="text-center">
+                    <p class="mb-0">Don't have an account? <a href="{{ url_for('signup') }}" class="text-decoration-none">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.form-label {
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+.input-group-text {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+}
+
+.input-group .form-control:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .form-control:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .input-group-text:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .input-group-text:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .form-control:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.input-group .input-group-text:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-control:focus::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .form-control {
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .form-control:focus {
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .input-group-text {
+        background: rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .input-group-text {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .glass-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Login link styling */
+.text-decoration-none {
+    color: var(--primary-color);
+    position: relative;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.text-decoration-none::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.text-decoration-none:hover {
+    color: var(--primary-color);
+    text-shadow: 0 0 8px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.text-decoration-none:hover::after {
+    width: 100%;
+}
+
+/* Button styling */
+.btn-primary {
+    background: rgba(var(--primary-color-rgb), 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: all 0.6s ease;
+    z-index: -1;
+}
+
+.btn-primary:hover {
+    background: rgba(var(--primary-color-rgb), 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.btn-primary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .btn-primary {
+        background: rgba(var(--primary-color-rgb), 0.7);
+    }
+    
+    .btn-primary:hover {
+        background: rgba(var(--primary-color-rgb), 0.8);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .btn-primary {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+</style>
+{% endblock %}

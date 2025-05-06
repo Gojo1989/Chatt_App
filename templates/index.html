@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to ChatApp{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        min-height: 100vh;
+        /* background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(74, 144, 226, 0.05)); */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+        opacity: 0.1;
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    } */
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    body.dark-mode .glass-card {
+        background: rgba(33, 37, 41, 0.1);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .welcome-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(var(--primary-color-rgb), 0.3);
+    }
+
+    .welcome-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .auth-btn {
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: 0.5s;
+    }
+
+    .auth-btn:hover::before {
+        left: 100%;
+    }
+
+    .auth-btn-primary {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
+    }
+
+    .auth-btn-outline {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        backdrop-filter: blur(5px);
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .auth-btn-primary:hover {
+        background: var(--primary-color);
+        color: white;
+        box-shadow: 0 6px 20px rgba(var(--primary-color-rgb), 0.4);
+    }
+
+    .auth-btn-outline:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .auth-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .auth-btn:hover i {
+        transform: scale(1.2);
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .feature-item {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .feature-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(var(--primary-color-rgb), 0.3);
+    }
+
+    .feature-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .feature-description {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 1rem;
+        }
+
+        .glass-card {
+            padding: 1.5rem;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+        }
+
+        .auth-buttons {
+            flex-direction: column;
+        }
+
+        .auth-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="glass-card">
+        <h1 class="welcome-title">Welcome to ChatApp</h1>
+        <p class="welcome-subtitle">Connect with friends and colleagues in real-time</p>
+        
+        {% if 'userid' in session %}
+            <div class="d-flex align-items-center justify-content-center mb-4">
+                <div>
+                    <h5 class="mb-0">Logged in as: {{ session['userid'] }}</h5>
+                    <small class="text-muted">Ready to chat!</small>
+                </div>
+            </div>
+            <div class="auth-buttons">
+                <a href="{{ url_for('dashboard') }}" class="auth-btn auth-btn-primary">
+                    <i class="fas fa-comments"></i> Go to Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="auth-btn auth-btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        {% else %}
+            <div class="auth-buttons">
+                <a href="{{ url_for('login') }}" class="auth-btn auth-btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="{{ url_for('signup') }}" class="auth-btn auth-btn-outline">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+            </div>
+        {% endif %}
+
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="feature-title">Real-time Chat</h3>
+                <p class="feature-description">Instant messaging with friends and colleagues</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Secure</h3>
+                <p class="feature-description">End-to-end encryption for your messages</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">Responsive</h3>
+                <p class="feature-description">Works on all devices and screen sizes</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
