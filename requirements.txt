@@ -68,7 +68,7 @@ google-generativeai==0.8.1
 google-pasta==0.2.0
 google-trans-new==1.1.9
 googleapis-common-protos==1.63.2
-googletrans==4.0.0rc1
+deep-translator==1.11.4
 gradio==4.27.0
 gradio_client==0.15.1
 greenlet==3.0.3
