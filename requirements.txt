@@ -141,7 +141,7 @@ mypy-extensions==1.0.0
 namex==0.0.8
 networkx==3.3
 numba==0.59.1
-numpy==1.24.4
+numpy
 onnxruntime==1.17.1
 openai-whisper==20231117
 opencv-contrib-python==4.10.0.84
